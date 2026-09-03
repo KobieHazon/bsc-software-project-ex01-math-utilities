@@ -1,0 +1,9 @@
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+Testing/
+*.o
+ex1
+test_mathisfun
+.DS_Store

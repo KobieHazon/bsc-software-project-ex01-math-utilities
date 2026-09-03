@@ -1,85 +1,92 @@
 #include "MathIsFun.h"
 
-/*
- * Calculates the largest integer less or equal than the square root of x.
- * funSqrt(10) = 3
- * funSqrt(16) = 4
- * @param x - An integer for which the function applies
- * @return the value of |_sqrt(x)_|, if x is negative then the function
- * returns -1.
- */
-int funSqrt(int x); // ==> Declaration is always in the beginning of the file.
+static int funModulu(int a, int d) {
+    int remainder;
 
-/*
- * Calculates a % d (for negative numbers as well).
- * @param a - An integer for which the function applies
- * @param d - An integer for modulu
- * @return the value of x%d if x is positive and (x+d) % d if x is negative.
- */
-int funModulu(int a, int d);
-
-
-int funModulu(int a, int d) {
-    int temp = a;
-    while (temp < 0) {
-        temp += d;
+    if (d <= 0) {
+        return 0;
     }
-    return temp % d;
+
+    remainder = a % d;
+    if (remainder < 0) {
+        remainder += d;
+    }
+    return remainder;
+}
+
+static int funSqrt(int x) {
+    int low = 0;
+    int high = x;
+    int answer = 0;
+
+    if (x < 0) {
+        return -1;
+    }
+
+    while (low <= high) {
+        int middle = low + (high - low) / 2;
+        long long square = (long long)middle * middle;
+
+        if (square <= x) {
+            answer = middle;
+            low = middle + 1;
+        } else {
+            high = middle - 1;
+        }
+    }
+    return answer;
 }
 
 int funPow(int x, int n, int d) {
-    int result;
-    if (n == 0) return 1;
-    if (n == 1) return funModulu(x, d);
-    if ((n % 2) == 0) {
-        result = funPow(x, n / 2, d);
-        return funModulu(result * result, d);
-    }
-    else {
-        result = funPow(x, (n - 1) / 2, d);
-        return funModulu(result * x * result, d);
-    }
-}
+    long long base;
+    long long result;
 
-int funSqrt(int x) {
-    int low = 1;
-    int high = x / 2;
-    int middle = (high + low) / 2;
-
-    if (x < 0) return -1;
-    while ((x < middle*middle) || (((middle+1)*(middle+1) <= x))){
-        if (x < middle*middle)
-            high = middle - 1;
-        else
-            low = middle + 1;
-        middle = (high + low) / 2;
+    if (n < 0 || d <= 0) {
+        return 0;
     }
-    return middle;
+
+    base = funModulu(x, d);
+    result = 1 % d;
+
+    while (n > 0) {
+        if (n % 2 != 0) {
+            result = (result * base) % d;
+        }
+        base = (base * base) % d;
+        n /= 2;
+    }
+    return (int)result;
 }
 
 bool funPrimeCheck(int x) {
-    int sqrtX = funSqrt(x);
-    int i = 2;
+    int limit;
+    int divisor;
 
-    if (x == 1) return false;
-    for (i; i <= sqrtX; i++){
-        if (funModulu(x, i) == 0)
+    if (x < 2) {
+        return false;
+    }
+
+    limit = funSqrt(x);
+    for (divisor = 2; divisor <= limit; divisor++) {
+        if (funModulu(x, divisor) == 0) {
             return false;
+        }
     }
     return true;
 }
 
 bool funPalindromeCheck(int x) {
-    int temp, reverse = 0;
+    int original = x;
+    long long reversed = 0;
 
-    if (x < 0) return false; //negative numbers are not palindromes
-    temp = x;
-
-    while (temp != 0) {
-        reverse *= 10;
-        reverse += temp % 10;
-        temp /= 10;
+    if (x < 0) {
+        return false;
     }
-    if (reverse == x) return true;
-    return false;
+
+    while (x != 0) {
+        reversed *= 10;
+        reversed += x % 10;
+        x /= 10;
+    }
+    return reversed == original;
 }
